@@ -69,6 +69,10 @@ pnpm run build
 6. Go to **App Home** and enable the **Messages Tab**
 7. Check **"Allow users to send Slash commands and messages from the messages tab"**
 
+### Don't enable Agent / Assistant mode
+
+Slack has an **Agents & AI Apps** toggle in the app config — leave it **off**. Enabling it puts the bot under Slack's Assistants API, which (a) forces every DM into a thread under the welcome message and (b) triggers a stuck "Typing…" indicator because the current `@chat-adapter/slack` never calls `assistant.threads.setStatus("")` to clear it.
+
 ### Event Subscriptions
 
 8. Go to **Event Subscriptions** and toggle **Enable Events**
@@ -99,7 +103,7 @@ Sync to container: `mkdir -p data/env && cp .env data/env/env`
 
 The Chat SDK bridge automatically starts a shared webhook server on port 3000 (configurable via `WEBHOOK_PORT` env var). The server handles `/webhook/slack` for Slack and other webhook-based adapters. This port must be publicly reachable from the internet for Slack to deliver events.
 
-If running locally, discuss options for exposing the server — e.g. ngrok (`ngrok http 3000`), Cloudflare Tunnel, or a reverse proxy on a VPS. The resulting public URL becomes the base for `https://your-domain/webhook/slack`.
+If running locally, discuss options for exposing the server. **Recommended**: Tailscale Funnel — free, stable URL, persistent across reboots. Install Tailscale, sign in, then `tailscale funnel --bg 3000` gives you `https://<machine>.<tailnet>.ts.net`. Alternatives: ngrok (`ngrok http 3000`), Cloudflare Tunnel, or a reverse proxy on a VPS. The resulting public URL becomes the base for `https://your-domain/webhook/slack`.
 
 ## Next Steps
 
